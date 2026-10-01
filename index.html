@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>CHEQUE DEPOSIT FORM</title>
+  <link rel="icon"
+        href="https://pristinepearl.github.io/Home/alt-logo.png"
+        type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Inter', 'sans-serif'] },
+                colors: {
+                    'primary-indigo': '#4F46E5',
+                    'dark-indigo': '#3730A3',
+                    'secondary-green': '#059669',
+                    'upload-red': '#DC2626',
+                    'app-bg': '#F4F7F9',
+                    'card-bg': '#ffffff',
+                    'input-bg': '#F9FAFB',
+                },
+                boxShadow: {
+                    'xl': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                }
+            }
+        }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; }
+    input[type="text"], textarea, input[name*="chqNumber"], input[name*="invoiceDetails"], input[name*="remarks"], input#otherBankName { text-transform: uppercase; }
+    select {
+        -webkit-appearance: none; -moz-appearance: none; appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="%234F46E5" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592c.86 0 1.32 1.013.754 1.658L8.753 11.14a.92.92 0 0 1-1.506 0z"/></svg>');
+        background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem;
+    }
+    .table-container { max-height: 400px; overflow-y: auto; border-radius: 0.75rem; border: 1px solid #c7d2fe; }
+    th { position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); padding-top: 1rem; padding-bottom: 1rem; }
+    .item-row input[name*="chqValue"] { text-align: right; font-weight: 600; color: #DC2626; background: #FEF2F2; }
+    .item-row input, .item-row select { padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0.5rem; transition: border-color 0.2s, box-shadow 0.2s; }
+    .item-row td { padding: 0.5rem; }
+
+    /* ── NEFT FLOATING BUTTON ── */
+    #neftFab {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #059669 0%, #0ea5e9 100%);
+      box-shadow: 0 6px 24px rgba(5,150,105,0.45);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none; transition: transform 0.2s, box-shadow 0.2s;
+      flex-direction: column; gap: 2px;
+    }
+    #neftFab:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(5,150,105,0.55); }
+    #neftFab span { color: white; font-size: 9px; font-weight: 800; letter-spacing: 1px; line-height: 1; }
+
+    /* ── NEFT MODAL OVERLAY ── */
+    #neftOverlay {
+      position: fixed; inset: 0; background: rgba(17,24,39,0.7);
+      z-index: 200; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    #neftOverlay.open { opacity: 1; pointer-events: all; }
+    #neftPanel {
+      background: white; border-radius: 1.25rem; width: 95%; max-width: 820px;
+      max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(5,150,105,0.2);
+      transform: translateY(30px); transition: transform 0.25s;
+      border: 1.5px solid #a7f3d0;
+    }
+    #neftOverlay.open #neftPanel { transform: translateY(0); }
+
+    /* NEFT table container */
+    .neft-table-container { max-height: 320px; overflow-y: auto; border-radius: 0.75rem; border: 1px solid #a7f3d0; }
+    .neft-table-container th { position: sticky; top: 0; z-index: 10; padding: 0.75rem 1rem; }
+
+    /* Excel upload drag area */
+    #neftDropZone {
+      border: 2px dashed #6ee7b7; border-radius: 0.75rem;
+      padding: 1.5rem; text-align: center; cursor: pointer;
+      transition: background 0.2s; background: #f0fdf4;
+    }
+    #neftDropZone.dragover { background: #dcfce7; border-color: #059669; }
+    #neftDropZone input[type="file"] { display: none; }
+
+    /* Loading spinner */
+    .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* NEFT input uppercase */
+    #neftPanel input[type="text"], #neftPanel input[type="number"] { text-transform: uppercase; }
+  </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen font-sans antialiased" style="background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 40%, #ede9fe 100%)">
+  
+  <div class="container mx-auto">
+    <div class="bg-card-bg rounded-2xl p-6 sm:p-10 max-w-6xl mx-auto" style="box-shadow: 0 4px 30px rgba(79,70,229,0.13); border: 1px solid #c7d2fe;">
+      
+      <h1 class="text-3xl font-extrabold pb-4 mb-8 flex items-center justify-center tracking-wider" style="background: linear-gradient(135deg, #312e81 0%, #4f46e5 45%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #c7d2fe;">
+          <img src="https://pristinepearl.github.io/Home/alt-logo.png" alt="Pristine Pearl Pharma Logo" class="h-10 w-auto mr-4 rounded-full p-0.5 bg-gray-50 transition duration-300 hover:scale-105">
+          PRISTINE PEARL PHARMA PVT LTD
+      </h1>
+
+      <div class="p-5 border rounded-xl mb-8 space-y-6" style="background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%); border-color: #c7d2fe;">
+          <h2 class="text-md font-semibold pb-2 uppercase tracking-wider" style="background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #c7d2fe;">💳 Deposit Details</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+            <div class="input-group">
+              <label for="receivedFrom" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Received From</label>
+              <input id="receivedFrom" type="text" value="" required list="receivedFromNames"
+                     class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-200 text-sm">
+            </div>
+            <div class="input-group">
+              <label for="receivedDate" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Received Date</label>
+              <input id="receivedDate" type="date" value="" required
+                     class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-200 text-sm">
+            </div>
+            <div class="input-group">
+              <label for="state" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">State</label>
+              <select id="state" required class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-200 text-sm">
+                <option value="" disabled selected class="text-gray-400">-- SELECT STATE --</option>
+                <option value="TN1">TN1</option>
+                <option value="TN2">TN2</option>
+                <option value="KL">KL</option>
+                <option value="KA">KA</option>
+                <option value="JK">JK</option>
+                <option value="GOA">GOA</option>
+              </select>
+            </div>
+          </div>
+
+          <h2 class="text-md font-semibold pb-2 pt-4 uppercase tracking-wider" style="background: linear-gradient(90deg, #0ea5e9 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #a7f3d0;">🏦 Party & Bank Details</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+            <div class="input-group">
+              <label for="partyName" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Party Name</label>
+              <input id="partyName" type="text" value="" required list="partyNames"
+                     class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-200 text-sm">
+            </div>
+            <div class="input-group">
+              <label for="bankName" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Party Bank Name</label>
+              <select id="bankName" required class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-200 text-sm"></select>
+              <input id="otherBankName" type="text" placeholder="ENTER BANK NAME" style="display: none;"
+                     class="w-full mt-2 py-2 px-3 border border-gray-500 rounded-lg bg-white focus:ring-2 focus:ring-secondary-green focus:border-secondary-green transition duration-200 text-sm">
+            </div>
+            <div class="input-group">
+              <label for="branch" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Branch</label>
+              <input id="branch" type="text" value="" required
+                     class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-200 text-sm">
+            </div>
+          </div>
+          <datalist id="partyNames"></datalist>
+          <datalist id="receivedFromNames"></datalist>
+      </div>
+
+      <h2 class="text-lg font-bold border-b border-gray-200 pb-2 mb-4 mt-6 uppercase tracking-wider" style="background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📋 Cheque Details</h2>
+
+      <div class="table-container shadow-lg">
+          <table class="min-w-full">
+            <thead style="background: linear-gradient(90deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);" class="text-white">
+              <tr>
+                <th style="width: 3%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">#</th>
+                <th style="width: 10%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Chq Date</th>
+                <th style="width: 13%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Chq Number</th>
+                <th style="width: 12%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Chq Value (₹)</th>
+                <th style="width: 13%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Deposited Bank</th>
+                <th style="width: 10%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Deposited Date</th>
+                <th style="width: 20%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Invoice Details</th>
+                <th style="width: 15%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Remarks</th>
+                <th style="width: 4%;" class="p-4 text-center text-xs font-semibold uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTable" class="divide-y divide-gray-200 bg-white"></tbody>
+          </table>
+      </div>
+
+      <div class="total-value-container flex justify-end items-center p-4 rounded-b-lg shadow-inner" style="background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%); border-top: 2px solid #6366f1;">
+          <span class="text-lg font-bold text-dark-indigo uppercase tracking-wider">TOTAL CHEQUE VALUE:</span>
+          <strong id="totalValueDisplay" class="text-2xl font-extrabold text-upload-red ml-4">₹ 0.00</strong>
+      </div>
+
+      <div class="actions flex flex-col sm:flex-row justify-between items-center mt-8 space-y-4 sm:space-y-0">
+        <div class="left-actions flex gap-4">
+          <button id="addRowBtn" type="button"
+                  class="px-6 py-3 rounded-xl font-semibold text-white transition duration-300 shadow-lg"
+                  style="background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%); box-shadow: 0 4px 15px rgba(14,165,233,0.35);"
+                  onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            <i class="fa-solid fa-plus"></i> Add Cheque Row
+          </button>
+        </div>
+        <div class="right-actions flex items-center gap-4">
+          <button id="reportBtn" type="button"
+                  class="px-6 py-3 rounded-xl font-semibold text-white transition duration-300 shadow-lg"
+                  style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); box-shadow: 0 4px 15px rgba(79,70,229,0.35);">
+            <i class="fa-solid fa-file-lines"></i> View Report
+          </button>
+          <button id="modifyBtn" type="button"
+                  class="px-6 py-3 rounded-xl font-semibold text-white transition duration-300 shadow-lg"
+                  style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); box-shadow: 0 4px 15px rgba(245,158,11,0.35);">
+            <i class="fa-solid fa-pen-to-square"></i> Modify
+          </button>
+          <span id="statusMessage" class="status-message text-sm font-medium text-secondary-green"></span>
+          <button id="submitToSheet" type="button"
+                  class="px-6 py-3 rounded-xl font-semibold text-white transition duration-300 shadow-lg"
+                  style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); box-shadow: 0 4px 15px rgba(239,68,68,0.35);">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       NEFT FLOATING ACTION BUTTON
+  ══════════════════════════════════════════════════ -->
+  <button id="neftFab" title="BANK RECEIPTS" onclick="openNeft()">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="5" width="20" height="14" rx="2.5" fill="white" fill-opacity="0.25" stroke="white" stroke-width="1.5"/>
+      <path d="M2 9h20" stroke="white" stroke-width="1.5"/>
+      <rect x="5" y="13" width="4" height="2" rx="0.5" fill="white"/>
+      <rect x="11" y="13" width="6" height="2" rx="0.5" fill="white"/>
+      <path d="M19 3.5L19 7M17 5.5H21" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span>RECEIPTS</span>
+  </button>
+
+  <!-- ══════════════════════════════════════════════════
+       NEFT MODAL PANEL
+  ══════════════════════════════════════════════════ -->
+  <div id="neftOverlay">
+    <div id="neftPanel">
+
+      <!-- Header -->
+      <div class="p-6 pb-4" style="background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border-bottom: 1.5px solid #a7f3d0; border-radius: 1.25rem 1.25rem 0 0;">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #059669, #0ea5e9);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="5" width="20" height="14" rx="2.5" fill="white" fill-opacity="0.3" stroke="white" stroke-width="1.5"/>
+                <path d="M2 9h20" stroke="white" stroke-width="1.5"/>
+                <rect x="5" y="13" width="4" height="2" rx="0.5" fill="white"/>
+                <rect x="11" y="13" width="6" height="2" rx="0.5" fill="white"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-extrabold tracking-wide" style="background: linear-gradient(90deg, #065f46, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BANK RECEIPTS</h2>
+              <p class="text-xs text-gray-500 font-medium">Pristine Pearl Pharma Pvt Ltd</p>
+            </div>
+          </div>
+          <button onclick="closeNeft()" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition text-lg font-bold">✕</button>
+        </div>
+      </div>
+
+      <div class="p-6 space-y-6">
+
+        <!-- Loading state for party names -->
+        <div id="neftLoadingBanner" class="hidden text-xs text-center py-2 rounded-lg font-medium" style="background:#ecfdf5; color:#059669;">
+          <span class="spinner"></span> Fetching party list from Database…
+        </div>
+        <div id="neftErrorBanner" class="hidden text-xs text-center py-2 rounded-lg font-medium" style="background:#fef2f2; color:#dc2626;"></div>
+
+        <!-- Tabs: Manual | Excel Upload -->
+        <div class="flex gap-2 border-b border-gray-200 pb-0">
+          <button id="tabManual" onclick="switchTab('manual')"
+                  class="px-5 py-2 text-sm font-semibold rounded-t-lg border-b-2 transition"
+                  style="border-color: #059669; color: #059669; background: #ecfdf5;">
+            <i class="fa-solid fa-keyboard mr-1"></i> Manual Entry
+          </button>
+          <button id="tabExcel" onclick="switchTab('excel')"
+                  class="px-5 py-2 text-sm font-semibold rounded-t-lg border-b-2 border-transparent text-gray-500 transition hover:text-emerald-700">
+            <i class="fa-solid fa-file-excel mr-1"></i> Excel Upload
+          </button>
+        </div>
+
+        <!-- ── TAB: MANUAL ENTRY ── -->
+        <div id="panelManual">
+
+          <!-- Entry Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-xl" style="background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1px solid #a7f3d0;">
+            
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Date <span class="text-red-500">*</span></label>
+              <input id="neftDate" type="date"
+                     class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 text-sm transition"
+                     style="--tw-ring-color: #059669;">
+            </div>
+
+            <div class="lg:col-span-1">
+              <label class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Party Name <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <input id="neftPartyInput" type="text" placeholder="TYPE TO SEARCH..." autocomplete="off"
+                       class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white text-sm transition"
+                       oninput="filterNeftParties()" onfocus="showNeftDropdown()" onblur="hideNeftDropdownDelayed()">
+                <div id="neftPartyDropdown"
+                     class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-52 overflow-y-auto hidden"
+                     style="border-color:#a7f3d0;">
+                </div>
+              </div>
+              <input id="neftPartyValue" type="hidden">
+              <input id="neftStateValue" type="hidden">
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">State (Auto)</label>
+              <input id="neftStateDisplay" type="text" readonly placeholder="AUTO FROM PARTY"
+                     class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm font-semibold cursor-not-allowed"
+                     style="background: #f0fdf4; color: #065f46;">
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Amount (₹) <span class="text-red-500">*</span></label>
+              <input id="neftAmount" type="number" placeholder="0.00" min="0" step="0.01"
+                     class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white text-sm transition font-semibold text-right"
+                     style="color:#059669;">
+            </div>
+          </div>
+
+          <!-- Add row button -->
+          <div class="flex justify-between items-center mt-3">
+            <button onclick="addNeftRow()"
+                    class="px-5 py-2.5 rounded-xl font-semibold text-white text-sm transition shadow-lg"
+                    style="background: linear-gradient(135deg, #059669, #0ea5e9); box-shadow: 0 4px 15px rgba(5,150,105,0.3);">
+              <i class="fa-solid fa-plus mr-1"></i> Add to List
+            </button>
+            <span id="neftManualStatus" class="text-xs font-medium text-gray-500"></span>
+          </div>
+
+          <!-- Staged rows table -->
+          <div id="neftTableWrap" class="neft-table-container mt-4 hidden">
+            <table class="min-w-full text-sm">
+              <thead style="background: linear-gradient(90deg, #065f46, #059669, #0ea5e9);" class="text-white text-xs uppercase tracking-wider">
+                <tr>
+                  <th class="p-3 text-left" style="width:4%">#</th>
+                  <th class="p-3 text-left" style="width:18%">Date</th>
+                  <th class="p-3 text-left" style="width:38%">Party</th>
+                  <th class="p-3 text-left" style="width:12%">State</th>
+                  <th class="p-3 text-right" style="width:18%">Amount (₹)</th>
+                  <th class="p-3 text-center" style="width:10%">Del</th>
+                </tr>
+              </thead>
+              <tbody id="neftRowsBody" class="divide-y divide-gray-100 bg-white"></tbody>
+            </table>
+          </div>
+
+          <!-- Total -->
+          <div id="neftTotalBar" class="hidden flex justify-end items-center px-4 py-3 rounded-b-xl" style="background: linear-gradient(135deg, #ecfdf5, #f0fdf4); border-top: 2px solid #6ee7b7;">
+            <span class="text-sm font-bold text-gray-600 uppercase tracking-wider">TOTAL:</span>
+            <strong id="neftTotalDisplay" class="text-xl font-extrabold ml-3" style="color:#059669;">₹ 0.00</strong>
+          </div>
+
+        </div>
+
+        <!-- ── TAB: EXCEL UPLOAD ── -->
+        <div id="panelExcel" class="hidden space-y-4">
+
+          <!-- Template download -->
+          <div class="flex items-center justify-between p-4 rounded-xl" style="background: #fffbeb; border: 1px solid #fcd34d;">
+            <div>
+              <p class="text-sm font-semibold text-amber-800">📥 Download Template</p>
+              <p class="text-xs text-amber-600 mt-0.5">Fill the template and upload. Columns: <strong>Date | Party | Amount</strong></p>
+            </div>
+            <button onclick="downloadNeftTemplate()"
+                    class="px-4 py-2 text-sm font-semibold rounded-lg text-white transition"
+                    style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+              <i class="fa-solid fa-download mr-1"></i> Template
+            </button>
+          </div>
+
+          <!-- Drop zone -->
+          <div id="neftDropZone" onclick="document.getElementById('neftFileInput').click()" ondragover="neftDragOver(event)" ondragleave="neftDragLeave(event)" ondrop="neftDrop(event)">
+            <input type="file" id="neftFileInput" accept=".xlsx,.xls,.csv" onchange="handleNeftFile(event)">
+            <div class="flex flex-col items-center gap-2">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p class="text-sm font-semibold text-emerald-700">Drag & drop your Excel file here</p>
+              <p class="text-xs text-gray-500">or click to browse (.xlsx, .xls, .csv)</p>
+            </div>
+          </div>
+
+          <!-- Preview table after file parse -->
+          <div id="neftExcelPreview" class="hidden">
+            <p id="neftExcelFileName" class="text-xs text-gray-500 mb-2 font-medium"></p>
+            <div class="neft-table-container">
+              <table class="min-w-full text-sm">
+                <thead style="background: linear-gradient(90deg, #065f46, #059669, #0ea5e9);" class="text-white text-xs uppercase tracking-wider">
+                  <tr>
+                    <th class="p-3 text-left">#</th>
+                    <th class="p-3 text-left">Date</th>
+                    <th class="p-3 text-left">Party</th>
+                    <th class="p-3 text-left">State</th>
+                    <th class="p-3 text-right">Amount (₹)</th>
+                    <th class="p-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="neftExcelBody" class="divide-y divide-gray-100 bg-white"></tbody>
+              </table>
+            </div>
+            <div class="flex justify-end items-center px-3 py-2 rounded-b-xl mt-0" style="background:#ecfdf5; border-top: 2px solid #6ee7b7;">
+              <span class="text-sm font-bold text-gray-600 uppercase tracking-wider">TOTAL:</span>
+              <strong id="neftExcelTotal" class="text-xl font-extrabold ml-3" style="color:#059669;">₹ 0.00</strong>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── ACTION BUTTONS ── -->
+        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-gray-100 gap-3">
+          <button onclick="closeNeft()" class="px-5 py-2.5 rounded-xl font-semibold text-gray-600 text-sm bg-gray-100 hover:bg-gray-200 transition">
+            <i class="fa-solid fa-xmark mr-1"></i> Cancel
+          </button>
+          <div class="flex gap-3 items-center">
+            <span id="neftUploadStatus" class="text-xs font-semibold text-emerald-600"></span>
+            <button id="neftUploadBtn" onclick="uploadNeftData()"
+                    class="px-7 py-2.5 rounded-xl font-semibold text-white text-sm transition shadow-lg"
+                    style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); box-shadow: 0 4px 15px rgba(239,68,68,0.3);">
+              <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       CHEQUE MODAL (existing)
+  ══════════════════════════════════════════════════ -->
+  <div id="customModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden transition-opacity duration-300 flex items-center justify-center opacity-0" aria-modal="true" role="dialog">
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-11/12 max-w-sm transform transition-transform duration-300 scale-95">
+      <h3 id="modalTitle" class="text-xl font-bold mb-4 text-dark-indigo">Notification</h3>
+      <p id="modalBody" class="text-gray-600 mb-6"></p>
+      <div id="passwordGroup" class="mb-6 hidden">
+          <label for="modalPassword" class="block text-sm font-medium text-gray-700 mb-2">Report Password:</label>
+          <input type="password" id="modalPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition duration-150" placeholder="Enter password" autocomplete="off">
+      </div>
+      <div class="flex justify-end space-x-3">
+          <button id="modalCloseBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 font-medium">Close</button>
+          <button id="modalConfirmBtn" class="px-4 py-2 text-white rounded-lg transition duration-150 hidden font-medium" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SheetJS for Excel parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // CONFIGURATION
+    // ═══════════════════════════════════════════════════════════════
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2TalWdqp0qa8ZAxewKder-75f8t1MNHqoG41uuuJSoyY8PcfbyZh90V7NskXbXUiT9g/exec';
+    const SECRET_PASSWORD = 'pearl#chq';
+
+    // NEFT Script URL — UPDATE THIS to your NEFT Apps Script URL
+    const NEFT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFy0g-VLM5mcMF5MAEsGB_5KR-qdwk_DlsJQ4YTYE0IrxMIt2sqDMC3X1VUbHhCEn0/exec';
+
+    const BANK_OPTIONS_RAW = [
+        { value: "AB Bank Ltd.", text: "AB Bank Ltd." },
+        { value: "Airtel Payments Bank Ltd", text: "Airtel Payments Bank Ltd" },
+        { value: "American Express Banking Corporation", text: "American Express Banking Corporation" },
+        { value: "Andhra Pradesh Grameena Vikas Bank", text: "Andhra Pradesh Grameena Vikas Bank" },
+        { value: "Andhra Pragathi Grameena Bank", text: "Andhra Pragathi Grameena Bank" },
+        { value: "Arunachal Pradesh Rural Bank", text: "Arunachal Pradesh Rural Bank" },
+        { value: "Aryavart Bank", text: "Aryavart Bank" },
+        { value: "Assam Gramin Vikash Bank", text: "Assam Gramin Vikash Bank" },
+        { value: "Au Small Finance Bank Ltd.", text: "Au Small Finance Bank Ltd." },
+        { value: "Australia and New Zealand Banking Group Ltd.", text: "Australia and New Zealand Banking Group Ltd." },
+        { value: "Axis Bank Ltd.", text: "Axis Bank Ltd." },
+        { value: "Bandhan Bank Ltd.", text: "Bandhan Bank Ltd." },
+        { value: "Bangiya Gramin Vikash Bank", text: "Bangiya Gramin Vikash Bank" },
+        { value: "Bank of America", text: "Bank of America" },
+        { value: "Bank of Bahrain and Kuwait B.S.C.", text: "Bank of Bahrain and Kuwait B.S.C." },
+        { value: "Bank of Baroda", text: "Bank of Baroda" },
+        { value: "Bank of Ceylon", text: "Bank of Ceylon" },
+        { value: "Bank of China Limited", text: "Bank of China Limited" },
+        { value: "Bank of India", text: "Bank of India" },
+        { value: "Bank of Maharashtra", text: "Bank of Maharashtra" },
+        { value: "Bank of Nova Scotia", text: "Bank of Nova Scotia" },
+        { value: "Barclays Bank Plc.", text: "Barclays Bank Plc." },
+        { value: "Baroda Gujarat Gramin Bank", text: "Baroda Gujarat Gramin Bank" },
+        { value: "Baroda Rajasthan Kshetriya Gramin Bank", text: "Baroda Rajasthan Kshetriya Gramin Bank" },
+        { value: "Baroda UP Bank", text: "Baroda UP Bank" },
+        { value: "BNP Paribas", text: "BNP Paribas" },
+        { value: "Canara Bank", text: "Canara Bank" },
+        { value: "Capital Small Finance Bank Ltd", text: "Capital Small Finance Bank Ltd" },
+        { value: "Central Bank of India", text: "Central Bank of India" },
+        { value: "Chaitanya Godavari GB", text: "Chaitanya Godavari GB" },
+        { value: "Chhattisgarh Rajya Gramin Bank", text: "Chhattisgarh Rajya Gramin Bank" },
+        { value: "Citibank N.A.", text: "Citibank N.A." },
+        { value: "City Union Bank Ltd.", text: "City Union Bank Ltd." },
+        { value: "Coastal Local Area Bank Ltd", text: "Coastal Local Area Bank Ltd" },
+        { value: "CSB Bank Limited", text: "CSB Bank Limited" },
+        { value: "Canara Bank", text: "Canara Bank" },
+        { value: "DCB Bank Ltd.", text: "DCB Bank Ltd." },
+        { value: "DBS Bank India Limited", text: "DBS Bank India Limited" },
+        { value: "Deutsche Bank A.G.", text: "Deutsche Bank A.G." },
+        { value: "Dhanlaxmi Bank Ltd.", text: "Dhanlaxmi Bank Ltd." },
+        { value: "Federal Bank Ltd.", text: "Federal Bank Ltd." },
+        { value: "FINO Payments Bank Ltd", text: "FINO Payments Bank Ltd" },
+        { value: "HDFC Bank Ltd", text: "HDFC Bank Ltd" },
+        { value: "ICICI Bank Ltd.", text: "ICICI Bank Ltd." },
+        { value: "IDBI Bank Limited", text: "IDBI Bank Limited" },
+        { value: "IDFC FIRST Bank Limited", text: "IDFC FIRST Bank Limited" },
+        { value: "Indian Bank", text: "Indian Bank" },
+        { value: "Indian Overseas Bank", text: "Indian Overseas Bank" },
+        { value: "IndusInd Bank Ltd", text: "IndusInd Bank Ltd" },
+        { value: "Jammu & Kashmir Bank Ltd.", text: "Jammu & Kashmir Bank Ltd." },
+        { value: "Karnataka Bank Ltd.", text: "Karnataka Bank Ltd." },
+        { value: "Karur Vysya Bank Ltd.", text: "Karur Vysya Bank Ltd." },
+        { value: "Kerala Gramin Bank", text: "Kerala Gramin Bank" },
+        { value: "Kotak Mahindra Bank Ltd", text: "Kotak Mahindra Bank Ltd" },
+        { value: "Punjab & Sind Bank", text: "Punjab & Sind Bank" },
+        { value: "Punjab National Bank", text: "Punjab National Bank" },
+        { value: "RBL Bank Ltd.", text: "RBL Bank Ltd." },
+        { value: "South Indian Bank Ltd.", text: "South Indian Bank Ltd." },
+        { value: "Standard Chartered Bank", text: "Standard Chartered Bank" },
+        { value: "State Bank of India", text: "State Bank of India" },
+        { value: "Tamilnad Mercantile Bank Ltd.", text: "Tamilnad Mercantile Bank Ltd." },
+        { value: "UCO Bank", text: "UCO Bank" },
+        { value: "Union Bank of India", text: "Union Bank of India" },
+        { value: "YES Bank Ltd.", text: "YES Bank Ltd." }
+    ];
+
+    const BANK_OPTIONS = BANK_OPTIONS_RAW.map(b => ({ value: b.value.toUpperCase(), text: b.text.toUpperCase() }));
+    BANK_OPTIONS.push({ value: "OTHER", text: "OTHER" });
+
+    const DEPOSITED_BANK_OPTIONS = [
+        { value: "DBS", text: "DBS" },
+        { value: "HDFC", text: "HDFC" },
+        { value: "ICICI", text: "ICICI" }
+    ];
+
+    // ═══════════════════════════════════════════════════════════════
+    // DOM REFS
+    // ═══════════════════════════════════════════════════════════════
+    const itemsTableBody   = document.getElementById('itemsTable');
+    const addRowBtn        = document.getElementById('addRowBtn');
+    const submitBtn        = document.getElementById('submitToSheet');
+    const statusMessage    = document.getElementById('statusMessage');
+    const totalValueDisplay= document.getElementById('totalValueDisplay');
+    const reportBtn        = document.getElementById('reportBtn');
+    const modifyBtn        = document.getElementById('modifyBtn');
+    const receivedFromEl   = document.getElementById('receivedFrom');
+    const receivedDateEl   = document.getElementById('receivedDate');
+    const partyNameEl      = document.getElementById('partyName');
+    const bankNameEl       = document.getElementById('bankName');
+    const otherBankNameEl  = document.getElementById('otherBankName');
+    const branchEl         = document.getElementById('branch');
+    const stateEl          = document.getElementById('state');
+    const customModal      = document.getElementById('customModal');
+    const modalTitle       = document.getElementById('modalTitle');
+    const modalBody        = document.getElementById('modalBody');
+    const modalCloseBtn    = document.getElementById('modalCloseBtn');
+    const modalConfirmBtn  = document.getElementById('modalConfirmBtn');
+    const passwordGroup    = document.getElementById('passwordGroup');
+    const modalPasswordInput= document.getElementById('modalPassword');
+
+    let rowCount = 0;
+
+    // ═══════════════════════════════════════════════════════════════
+    // MODAL UTILITIES (Cheque form)
+    // ═══════════════════════════════════════════════════════════════
+    function hideModal() {
+        customModal.classList.add('opacity-0');
+        customModal.querySelector('.transform').classList.add('scale-95');
+        setTimeout(() => customModal.classList.add('hidden'), 300);
+        passwordGroup.classList.add('hidden');
+        modalConfirmBtn.classList.add('hidden');
+        modalPasswordInput.value = '';
+        modalConfirmBtn.onclick = null;
+        modalPasswordInput.onkeyup = null;
+    }
+    function showCustomMessage(title, message, color = 'text-dark-indigo') {
+        modalTitle.textContent = title;
+        modalTitle.className = `text-xl font-bold mb-4 ${color}`;
+        modalBody.textContent = message;
+        passwordGroup.classList.add('hidden');
+        modalConfirmBtn.classList.add('hidden');
+        modalCloseBtn.textContent = 'Close';
+        customModal.classList.remove('hidden');
+        setTimeout(() => { customModal.classList.remove('opacity-0'); customModal.querySelector('.transform').classList.remove('scale-95'); }, 10);
+        modalCloseBtn.onclick = hideModal;
+    }
+    function showPasswordModal() {
+        modalTitle.textContent = 'Report Access';
+        modalTitle.className = 'text-xl font-bold mb-4 text-primary-indigo';
+        modalBody.textContent = 'ENTER THE PASSWORD TO VIEW THE REPORT.';
+        passwordGroup.classList.remove('hidden');
+        modalConfirmBtn.classList.remove('hidden');
+        modalCloseBtn.textContent = 'Cancel';
+        customModal.classList.remove('hidden');
+        setTimeout(() => { customModal.classList.remove('opacity-0'); customModal.querySelector('.transform').classList.remove('scale-95'); modalPasswordInput.focus(); }, 10);
+        modalCloseBtn.onclick = hideModal;
+        modalConfirmBtn.onclick = () => {
+            const pwd = modalPasswordInput.value.trim();
+            hideModal();
+            if (pwd === SECRET_PASSWORD) { window.open('report.html', '_blank'); }
+            else { showCustomMessage('Access Denied', 'INCORRECT PASSWORD. PLEASE TRY AGAIN.', 'text-upload-red'); }
+        };
+        modalPasswordInput.onkeyup = e => { if (e.key === 'Enter') modalConfirmBtn.click(); };
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CHEQUE FORM LOGIC (unchanged)
+    // ═══════════════════════════════════════════════════════════════
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const p = dateString.split('-');
+        return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : dateString;
+    }
+    function toUpperCase(event) {
+        if (event.target.type !== 'number' && event.target.type !== 'date') event.target.value = event.target.value.toUpperCase();
+    }
+    function generateHeaderBankOptions() {
+        let o = '<option value="" disabled selected>-- PARTY BANK --</option>';
+        BANK_OPTIONS.forEach(b => { o += `<option value="${b.value}">${b.text}</option>`; });
+        return o;
+    }
+    function generateDepositedBankOptions() {
+        let o = '<option value="" disabled selected>--  --</option>';
+        DEPOSITED_BANK_OPTIONS.forEach(b => { o += `<option value="${b.value}">${b.text}</option>`; });
+        return o;
+    }
+    function newRow() {
+        rowCount++;
+        const tr = document.createElement('tr');
+        tr.classList.add('item-row', 'hover:bg-gray-50', 'transition');
+        tr.id = `row-${rowCount}`;
+        tr.innerHTML = `
+          <td class="p-2 text-center text-sm text-gray-700">${rowCount}</td>
+          <td class="p-2"><input type="date" name="chqDate" class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm"></td>
+          <td class="p-2"><input type="text" name="chqNumber" placeholder="CHEQUE NO." required maxlength="15" pattern="[0-9]*" class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm"></td>
+          <td class="p-2"><input type="number" name="chqValue" placeholder="0.00" min="0" step="0.01" value="0.00" oninput="updateGrandTotal()" class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm"></td>
+          <td class="p-2"><select name="depositedBank" required class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm">${generateDepositedBankOptions()}</select></td>
+          <td class="p-2"><input type="date" name="depositedDate" class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm"></td>
+          <td class="p-2"><input type="text" name="invoiceDetails" placeholder="INV-001, INV-002..." class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm"></td>
+          <td class="p-2"><input type="text" name="remarks" placeholder="NOTES" class="w-full py-1.5 px-2 border border-gray-300 rounded-lg text-sm"></td>
+          <td class="p-2 text-center"><button type="button" class="p-1 text-xs text-white bg-upload-red hover:bg-red-700 rounded-md transition" onclick="removeRow(this)"><i class="fa-solid fa-trash-can"></i></button></td>
+        `;
+        itemsTableBody.appendChild(tr);
+        tr.querySelectorAll('input[type="text"], textarea').forEach(i => i.addEventListener('input', toUpperCase));
+        tr.querySelector('input[name="chqDate"]').focus();
+    }
+    function removeRow(btn) { btn.closest('tr').remove(); updateGrandTotal(); reindexRows(); }
+    function reindexRows() {
+        itemsTableBody.querySelectorAll('.item-row').forEach((r, i) => { r.querySelector('td:first-child').textContent = i + 1; });
+        rowCount = itemsTableBody.querySelectorAll('.item-row').length;
+    }
+    function updateGrandTotal() {
+        let total = 0;
+        itemsTableBody.querySelectorAll('input[name="chqValue"]').forEach(i => { total += parseFloat(i.value) || 0; });
+        totalValueDisplay.textContent = '₹ ' + total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function collectData() {
+        const receivedFrom = receivedFromEl.value.trim();
+        const receivedDate = receivedDateEl.value;
+        const partyName    = partyNameEl.value.trim();
+        const branch       = branchEl.value.trim();
+        const state        = stateEl.value;
+        let bankNameValue  = bankNameEl.value;
+        if (bankNameValue === 'OTHER') {
+            bankNameValue = otherBankNameEl.value.trim();
+            if (!bankNameValue) { showCustomMessage('Validation Error', 'You selected "OTHER". Please type the bank name.', 'text-upload-red'); return null; }
+        }
+        if (!bankNameValue || !receivedFrom || !receivedDate || !partyName || !branch || !state) {
+            showCustomMessage('Validation Error', 'Please fill all required header fields.', 'text-upload-red'); return null;
+        }
+        const rows = itemsTableBody.querySelectorAll('.item-row');
+        if (!rows.length) { showCustomMessage('Validation Error', 'Please add at least one cheque entry.', 'text-upload-red'); return null; }
+        const formattedDate = formatDate(receivedDate);
+        const items = []; let allValid = true;
+        rows.forEach(row => {
+            const chqNumber    = row.querySelector('input[name="chqNumber"]').value.trim();
+            const depositedBank= row.querySelector('select[name="depositedBank"]').value;
+            if (!chqNumber || !depositedBank) allValid = false;
+            items.push({
+                timestamp: new Date().toLocaleString(),
+                receivedFrom, receivedDate: formattedDate, partyName,
+                bankName: bankNameValue, branch, state,
+                chqDate:       formatDate(row.querySelector('input[name="chqDate"]').value),
+                chqNumber,
+                chqValue:      parseFloat(row.querySelector('input[name="chqValue"]').value) || 0,
+                depositedBank,
+                depositedDate: formatDate(row.querySelector('input[name="depositedDate"]').value),
+                invoiceDetails: row.querySelector('input[name="invoiceDetails"]').value.trim(),
+                remarks:       row.querySelector('input[name="remarks"]').value.trim()
+            });
+        });
+        if (!allValid) { showCustomMessage('Validation Error', 'Fill all required cheque fields (Number, Deposited Bank).', 'text-upload-red'); return null; }
+        return items;
+    }
+    function submitDataToSheet() {
+        if (SCRIPT_URL === 'YOUR_GOOGLE_APP_SCRIPT_URL_HERE') { showCustomMessage('Config Error', 'Update SCRIPT_URL first.', 'text-upload-red'); return; }
+        const data = collectData();
+        if (!data) return;
+        statusMessage.textContent = 'SUBMITTING DATA...';
+        submitBtn.disabled = true; submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data }) })
+        .then(() => {
+            statusMessage.textContent = 'DATA UPLOADED SUCCESSFULLY! ✅';
+            setTimeout(() => {
+                receivedFromEl.value = ''; receivedDateEl.value = ''; partyNameEl.value = '';
+                bankNameEl.value = ''; otherBankNameEl.style.display = 'none'; otherBankNameEl.value = '';
+                branchEl.value = ''; stateEl.value = ''; itemsTableBody.innerHTML = '';
+                updateGrandTotal(); newRow();
+                submitBtn.disabled = false; submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                statusMessage.textContent = '';
+            }, 3000);
+        })
+        .catch(err => {
+            console.error(err);
+            showCustomMessage('Submission Error', 'SUBMISSION FAILED. Check console.', 'text-upload-red');
+            statusMessage.textContent = 'SUBMISSION FAILED.';
+            submitBtn.disabled = false; submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // NEFT — STATE & PARTY DATA (fetched from Google Sheet)
+    // ═══════════════════════════════════════════════════════════════
+    let neftPartyData  = []; // [{party, state}, ...]
+    let neftRows       = []; // staged rows for manual entry
+    let neftExcelRows  = []; // parsed rows from excel
+    let neftActiveTab  = 'manual';
+    let neftPartyFetched = false;
+
+    function openNeft() {
+        document.getElementById('neftOverlay').classList.add('open');
+        if (!neftPartyFetched) fetchNeftParties();
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('neftDate').value = today;
+    }
+    function closeNeft() {
+        document.getElementById('neftOverlay').classList.remove('open');
+    }
+    // Close on overlay click
+    document.getElementById('neftOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeNeft();
+    });
+
+    function fetchNeftParties() {
+        const loading = document.getElementById('neftLoadingBanner');
+        const errBanner = document.getElementById('neftErrorBanner');
+        loading.classList.remove('hidden');
+        errBanner.classList.add('hidden');
+
+        fetch(NEFT_SCRIPT_URL + '?action=getParties')
+        .then(r => r.json())
+        .then(data => {
+            loading.classList.add('hidden');
+            if (data.success && data.parties) {
+                neftPartyData = data.parties; // [{party, state}]
+                neftPartyFetched = true;
+            } else {
+                showNeftError('Could not load party list: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            loading.classList.add('hidden');
+            showNeftError('Network error fetching parties. Check NEFT_SCRIPT_URL.');
+            console.error(err);
+        });
+    }
+
+    function showNeftError(msg) {
+        const b = document.getElementById('neftErrorBanner');
+        b.textContent = '⚠ ' + msg;
+        b.classList.remove('hidden');
+    }
+
+    // ── Party search dropdown ──
+    function filterNeftParties() {
+        const q = document.getElementById('neftPartyInput').value.toUpperCase().trim();
+        document.getElementById('neftPartyInput').value = document.getElementById('neftPartyInput').value.toUpperCase();
+        renderNeftDropdown(q);
+    }
+    function showNeftDropdown() {
+        const q = document.getElementById('neftPartyInput').value.toUpperCase().trim();
+        renderNeftDropdown(q);
+    }
+    function renderNeftDropdown(q) {
+        const dd = document.getElementById('neftPartyDropdown');
+        const filtered = q
+            ? neftPartyData.filter(p => p.party.toUpperCase().includes(q))
+            : neftPartyData.slice(0, 50);
+        if (!filtered.length) { dd.classList.add('hidden'); return; }
+        dd.innerHTML = filtered.map(p => `
+          <div class="px-3 py-2 cursor-pointer hover:bg-emerald-50 text-sm border-b border-gray-100 last:border-0"
+               data-party="${p.party}" data-state="${p.state}"
+               onmousedown="selectNeftParty('${p.party.replace(/'/g,"\\'")}','${p.state}')">
+            <span class="font-medium text-gray-800">${p.party}</span>
+            <span class="ml-2 text-xs px-1.5 py-0.5 rounded font-bold" style="background:#ecfdf5;color:#059669;">${p.state}</span>
+          </div>`).join('');
+        dd.classList.remove('hidden');
+    }
+    function selectNeftParty(party, state) {
+        document.getElementById('neftPartyInput').value = party;
+        document.getElementById('neftPartyValue').value = party;
+        document.getElementById('neftStateValue').value = state;
+        document.getElementById('neftStateDisplay').value = state;
+        document.getElementById('neftPartyDropdown').classList.add('hidden');
+    }
+    function hideNeftDropdownDelayed() {
+        setTimeout(() => document.getElementById('neftPartyDropdown').classList.add('hidden'), 200);
+    }
+
+    // ── Tab switching ──
+    function switchTab(tab) {
+        neftActiveTab = tab;
+        document.getElementById('panelManual').classList.toggle('hidden', tab !== 'manual');
+        document.getElementById('panelExcel').classList.toggle('hidden', tab !== 'excel');
+        const manual = document.getElementById('tabManual');
+        const excel  = document.getElementById('tabExcel');
+        if (tab === 'manual') {
+            manual.style.cssText = 'border-color:#059669;color:#059669;background:#ecfdf5;';
+            excel.style.cssText  = 'border-color:transparent;color:#6b7280;background:transparent;';
+        } else {
+            excel.style.cssText  = 'border-color:#059669;color:#059669;background:#ecfdf5;';
+            manual.style.cssText = 'border-color:transparent;color:#6b7280;background:transparent;';
+        }
+    }
+
+    // ── Add row (manual) ──
+    function addNeftRow() {
+        const date   = document.getElementById('neftDate').value;
+        const party  = document.getElementById('neftPartyValue').value.trim();
+        const state  = document.getElementById('neftStateValue').value.trim();
+        const amount = parseFloat(document.getElementById('neftAmount').value) || 0;
+        const statusEl = document.getElementById('neftManualStatus');
+
+        if (!date)   { statusEl.textContent = '⚠ Date is required.'; statusEl.style.color='#dc2626'; return; }
+        if (!party)  { statusEl.textContent = '⚠ Select a party from dropdown.'; statusEl.style.color='#dc2626'; return; }
+        if (amount <= 0) { statusEl.textContent = '⚠ Amount must be > 0.'; statusEl.style.color='#dc2626'; return; }
+
+        neftRows.push({ date, party, state, amount });
+        statusEl.textContent = '';
+
+        // Clear fields
+        document.getElementById('neftPartyInput').value  = '';
+        document.getElementById('neftPartyValue').value  = '';
+        document.getElementById('neftStateValue').value  = '';
+        document.getElementById('neftStateDisplay').value= '';
+        document.getElementById('neftAmount').value      = '';
+
+        renderNeftManualTable();
+    }
+
+    function removeNeftRow(idx) {
+        neftRows.splice(idx, 1);
+        renderNeftManualTable();
+    }
+
+    function renderNeftManualTable() {
+        const wrap = document.getElementById('neftTableWrap');
+        const body = document.getElementById('neftRowsBody');
+        const totalBar = document.getElementById('neftTotalBar');
+
+        if (!neftRows.length) { wrap.classList.add('hidden'); totalBar.classList.add('hidden'); return; }
+
+        wrap.classList.remove('hidden');
+        totalBar.classList.remove('hidden');
+
+        let total = 0;
+        body.innerHTML = neftRows.map((r, i) => {
+            total += r.amount;
+            return `<tr class="hover:bg-gray-50">
+              <td class="p-2 text-center text-xs text-gray-500">${i+1}</td>
+              <td class="p-2 text-sm">${r.date}</td>
+              <td class="p-2 text-sm font-medium text-gray-800">${r.party}</td>
+              <td class="p-2"><span class="text-xs px-2 py-0.5 rounded font-bold" style="background:#ecfdf5;color:#059669;">${r.state}</span></td>
+              <td class="p-2 text-sm font-bold text-right" style="color:#059669;">₹ ${r.amount.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+              <td class="p-2 text-center"><button onclick="removeNeftRow(${i})" class="p-1 text-xs text-white rounded" style="background:#dc2626;"><i class="fa-solid fa-trash-can"></i></button></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('neftTotalDisplay').textContent = '₹ ' + total.toLocaleString('en-IN', {minimumFractionDigits:2});
+    }
+
+    // ── Excel Template Download ──
+    function downloadNeftTemplate() {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([['Date', 'Party', 'Amount']]);
+        ws['!cols'] = [{wch:15},{wch:40},{wch:15}];
+        XLSX.utils.book_append_sheet(wb, ws, 'NEFT');
+        XLSX.writeFile(wb, 'BankReceipt_Template.xlsx');
+    }
+
+    // ── Drag & Drop ──
+    function neftDragOver(e) { e.preventDefault(); document.getElementById('neftDropZone').classList.add('dragover'); }
+    function neftDragLeave()  { document.getElementById('neftDropZone').classList.remove('dragover'); }
+    function neftDrop(e)      { e.preventDefault(); neftDragLeave(); if (e.dataTransfer.files[0]) parseNeftExcel(e.dataTransfer.files[0]); }
+    function handleNeftFile(e) { if (e.target.files[0]) parseNeftExcel(e.target.files[0]); }
+
+    function parseNeftExcel(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const wb   = XLSX.read(e.target.result, { type: 'binary', cellDates: true });
+            const ws   = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
+            if (rows.length < 2) { showNeftError('Excel file is empty or has no data rows.'); return; }
+
+            // Detect header: Date | Party | Amount
+            const header = (rows[0] || []).map(h => String(h).trim().toUpperCase());
+            const di = header.findIndex(h => h.includes('DATE'));
+            const pi = header.findIndex(h => h.includes('PARTY'));
+            const ai = header.findIndex(h => h.includes('AMOUNT'));
+            if (di < 0 || pi < 0 || ai < 0) { showNeftError('Excel must have columns: Date, Party, Amount'); return; }
+
+            neftExcelRows = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.every(c => !c)) continue;
+                const partyName = String(row[pi] || '').trim().toUpperCase();
+                const amountRaw = parseFloat(String(row[ai] || '').replace(/,/g,''));
+                // Match party to get state
+                const match = neftPartyData.find(p => p.party.toUpperCase() === partyName);
+                neftExcelRows.push({
+                    date:   String(row[di] || '').trim(),
+                    party:  partyName,
+                    state:  match ? match.state : '?',
+                    amount: isNaN(amountRaw) ? 0 : amountRaw,
+                    valid:  !!(partyName && !isNaN(amountRaw) && amountRaw > 0 && match)
+                });
+            }
+            renderNeftExcelPreview(file.name);
+        };
+        reader.readAsBinaryString(file);
+    }
+
+    function renderNeftExcelPreview(fileName) {
+        document.getElementById('neftExcelFileName').textContent = `📄 ${fileName} — ${neftExcelRows.length} row(s) detected`;
+        const body = document.getElementById('neftExcelBody');
+        let total = 0;
+        body.innerHTML = neftExcelRows.map((r, i) => {
+            total += r.amount;
+            const badge = r.valid
+                ? `<span class="text-xs px-2 py-0.5 rounded font-bold" style="background:#ecfdf5;color:#059669;">✓ OK</span>`
+                : `<span class="text-xs px-2 py-0.5 rounded font-bold" style="background:#fef2f2;color:#dc2626;">⚠ Check</span>`;
+            return `<tr class="hover:bg-gray-50">
+              <td class="p-2 text-center text-xs text-gray-500">${i+1}</td>
+              <td class="p-2 text-sm">${r.date}</td>
+              <td class="p-2 text-sm font-medium text-gray-800">${r.party}</td>
+              <td class="p-2"><span class="text-xs px-2 py-0.5 rounded font-bold" style="background:#ecfdf5;color:#059669;">${r.state}</span></td>
+              <td class="p-2 text-sm font-bold text-right" style="color:#059669;">₹ ${r.amount.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+              <td class="p-2 text-center">${badge}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('neftExcelTotal').textContent = '₹ ' + total.toLocaleString('en-IN', {minimumFractionDigits:2});
+        document.getElementById('neftExcelPreview').classList.remove('hidden');
+    }
+
+    // ── Upload NEFT Data ──
+    function uploadNeftData() {
+    const statusEl  = document.getElementById('neftUploadStatus');
+    const uploadBtn = document.getElementById('neftUploadBtn');
+
+    let allRows   = [];
+    let errorRows = [];
+
+    if (neftActiveTab === 'manual') {
+        /* Manual rows are always valid (party was selected from dropdown) */
+        allRows   = neftRows;
+        errorRows = [];
+    } else {
+        allRows   = neftExcelRows;
+        errorRows = neftExcelRows.filter(r => !r.valid);
+        allRows   = neftExcelRows.filter(r => r.valid);
+    }
+
+    if (!allRows.length && !errorRows.length) {
+        statusEl.textContent = '⚠ No data to upload.';
+        statusEl.style.color = '#dc2626';
+        return;
+    }
+
+    /* If everything is invalid, skip the fetch and just download errors */
+    if (!allRows.length) {
+        statusEl.textContent = `⚠ 0 valid rows — downloading error report (${errorRows.length} rows).`;
+        statusEl.style.color = '#dc2626';
+        downloadNeftErrorReport(errorRows);
+        return;
+    }
+
+    if (NEFT_SCRIPT_URL.includes('YOUR_NEFT_SCRIPT_URL')) {
+        statusEl.textContent = '⚠ Update NEFT_SCRIPT_URL in config.';
+        statusEl.style.color = '#dc2626';
+        return;
+    }
+
+    statusEl.textContent = 'Uploading…';
+    statusEl.style.color = '#059669';
+    uploadBtn.disabled = true;
+
+    const payload = allRows.map(r => ({
+        date:      r.date,
+        party:     r.party,
+        state:     r.state,
+        amount:    r.amount,
+        timestamp: new Date().toLocaleString()
+    }));
+
+    fetch(NEFT_SCRIPT_URL, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'addNeft', data: payload })
+    })
+    .then(() => {
+        uploadBtn.disabled = false;
+
+        if (errorRows.length) {
+            /* Partial success — download error report automatically */
+            statusEl.textContent =
+                `✅ ${payload.length} uploaded  |  ⚠ ${errorRows.length} failed — downloading error report…`;
+            statusEl.style.color = '#f59e0b';
+            downloadNeftErrorReport(errorRows);
+        } else {
+            statusEl.textContent = `✅ ${payload.length} record(s) uploaded!`;
+            statusEl.style.color = '#059669';
+        }
+
+        /* Reset staged data */
+        neftRows = []; neftExcelRows = [];
+        renderNeftManualTable();
+        document.getElementById('neftExcelPreview').classList.add('hidden');
+        document.getElementById('neftFileInput').value = '';
+
+        setTimeout(() => { statusEl.textContent = ''; closeNeft(); }, 3500);
+    })
+    .catch(err => {
+        statusEl.textContent = '❌ Upload failed. Check console.';
+        statusEl.style.color = '#dc2626';
+        uploadBtn.disabled = false;
+        console.error(err);
+    });
+}
+
+    // ═══════════════════════════════════════════════════════════════
+    // CHEQUE PARTY NAMES & RECEIVED FROM
+    // ═══════════════════════════════════════════════════════════════
+    const PARTY_NAMES = [
+      "A K T PHARMA","ABIRAMI AGENCIES","ACCESS LIFESCIENCES","ADARSH PHARMA","AISWARYAM PHARMA","AK PHARMA","AL SARORAJ PHARMACEUTICALS","ALAMELU ENTERPRISES","ALLIED PHARMA","AMY PHARMA","AN.M MEDICAL AGENCIES","ANANDHA PHARMACY PRIVATE LIMITED","ANDAVAR PHARMA","ANGEL PHARMACEUTICALS","ARUN BALAJI AGENCIES","ASHOK MEDICAL AGENCIES","ASHOKA PHARMA","ATOMLIFE HEALTHCARE AND RESEARCH P LTD.","AVICOT SURGICALS","BALAJI MEDICAL AGENCY","BALAJI PHARMACEUTICALS","BHAGYALAXMI DISTRIBUTORS","BR ASSOCIATES","BROTHERS PHARMA","CENTRAL DISTRIBUTORS","CHANDRATHIL DRUG HOUSE","CHELLAS PHARMA DISTRIBUTORS","CHIRAG MEDICARE SOLUTIONS PVT.LTD.","CHITRA AGENCIES","COVAI PHARMA","CSK LIFE CARE","DEVAKI PHARMA","DEVI PHARMA WELLNESS PRIVATE LIMITED","DHANVANTARI DISTRIBUTORS","DHARMAPURI PHARMA AGENCY","DROGARIA SALCETE","EC AGENCIES","FATHIMA HEALTH CARE","GALAXY DISTRIBUTORS","GANESHA PHARMACY","GANGA DISTRIBUTORS","GEETHA PHARMA","GOA DOCTORS ALLIANCE PVT LTD","GOPI MEDICAL AGENCY","GUDDODGI PHARMACEUTICAL DISTRIBUTORS","GUPTA PHARMA","GURU MEDICALS","GVS PHARMACEUTICALS","HEALTH MART","HERITAGE MARKETERS","INCAMED HEALTHCARE PVT LTD","J.J.PHARMACEUTICALS","JANANI PHARMACEUTICALS","JAYASANTHI PHARMA AND VACCINE","JEE PHARMACEUTICALS","KADLIMATTI PHARMACEUTICALS","KALLAT DRUG LINES","KALYANI PHARMA DISTRIBUTORS","KAMALAM MEDICAL CORPORATION","KANNAN AGENCIES","KAPILA PHARMA","KARTHIK MEDICAL AGENCIES","KERALA CHEMICAL & BIOLOGICAL AGENCY","KERALA COMMERCIAL DISTRIBUTORS","KEYSONS PHARMA","KM AGENCIES","KONGU MEDICAL DISTRIBUTION","KOOTTIPARAMBIL COMBINES","KRISHNA PHARMACEUTICAL REMEDIES","KUGAAN PHARMA","KUMARAN MEDICARE","LAKSHMI AGENCIES","LEKSHMI DRUG HOUSE","LEO PHARMA DISTRIBUTORS P LTD","LIFE CARE PHARMA PVT LTD","LOTUS HEALTH CARE","LPH PHARMA PVT LTD","M.G. PHARMACEUTICAL DISTRIBUTORS","MADURAI HOSPITAL SUPPLIERS","MADURAI PHARMACEUTICAL DISTRIBUTOR","MAHAVEER MEDI SALES PVT. LTD","MAHENDRA DRUG AGENCIES","MALABAR DRUGS","MANI PHARMACEUTICALS","MANOJ PHARMACEUTICALS","MARUTHI AGENCY","MEDI HOUSE","MEDI SALES","MEDICOTRADE DISTRIBUTORS","MEDIHAUXE PHARMACEUTICALS PVT.LTD.","MEENA PHARMA","MOHANA AGENCIES","MONEY PHARMA","N L COMBINES","NAGAMMAI PHARMA","NANDANA PHARMA DISTRIBUTORS","NATIONAL AGENCIES","NATIONAL DRUG LINES","NEW LIFE ENTERPRISES","NEW RRPD PVT LTD","NEW SUJITH PHARMA","NEW VISWABHARATHY DRUG LINES PVT LTD.","NF LIFELINES","NORTHERN PHARMA","NOYYAL PHARMA DISTRIBUTORS","NRS PHARMA","NUTHAN PHARMA","OMKAR PHARMACY","ORANGE AGENCIES","ORBIT DRUGS","PADMA PHARMACEUTICALS","PALEPU PHARMA DISTRIBUTORS PVT LTD","PARTNERS DRUG LINKS","PERFECT MEDICAL ENTERPRISES PVT LTD","PHARMACARE","POOJA DISTRIBUTORS","PRAGATI PHARMACEUTICALS","PURANI HOSPITAL SUPPLIES PVT LTD","R K MEDICALS AND AGENCY","R.P. PHARMACEUTICALS","RAGHAVA PHARMA","RAJAMANNAR MEDICAL AGENCIES","RAM AGENCIES","RAMESH PHARMA","RATHNA PHARMA AGENCIES","RELIANCE DRUGS","RESORT MEDICALS","ROYAL AGENCY","RR PHARMA","RS DRUGS & MEDICALS PVT LTD","RSM PHARMA PVT LTD","S K PHARMA","S P MEDITECH PVT LTD","SAI PHARMA","SAI RADHA PHARMA (INDIA) PVT.LTD.","SANJEEVANI DRUGS","SANSI AGENCIES","SANTHI PHARMACEUTICALS","SELVARATHNA AGENCIES","SENTHIL MURUGAN AGENCY","SENTHIL PHARMA","SERUM AND VACCINES","SHAKTHI LIFE LINES","SHALIMAR AGENCIES","SHANBALAJI PHARMA DISTRIBUTORS PVT LTD","SHANKAR GANESH ASSOCIATES","SHEEN PHARMA","SHIVA DRUG HOUSE","SHREE AMMAN PHARMA INDIA PVT LTD","SHREE PHARMACEUTICALS","SHREE RAGHAVENDRA ENTERPRISES","SHRI BHAKTHI MEDICAL AGENCIES P LTD","SHRI CHOUDHARI MEDICAL CENTRE","SHRI GURU AGENCIES","SHRI JAYAM MEDICAL AGENCIES","SHRI PHARMA ASSOCIATES","SHUNMUKAM MEDICAL HALL","SIKA AGENCIES","SP.SS MEDICAL HALL","SREE KUMARAN PHARMA","SREE MAHALAKSHMI PHARMA","SREE SP.A PHARMACEUTICALS","SREEPADMAM PHARMA AND AGENICES","SRI AMBAL JAI SHREE MEDICALS","SRI AMMAN MEDICAL AGENCIES","SRI ENTERPRISES","SRI GUHAN AGENCIES","SRI KAMALAM MEDICAL AGENCIES","SRI KARUR MEDICAL AGENCIES","SRI KRISHNA MEDICALS","SRI LAKSHMI PHARMACEUTICALS","SRI LAXMI DRUG STORES","SRI RAM MEDICAL AHENCIES","SRI RAM PHARMA AGENCIES","SRI SELVAGANESH MEDICALS AGENCIES","SRI SENTHIL MEDICAL AGENCIES","SRI SHANMUGA AGENCY","SRI SRINIVASA AGENCIES","SRI VENKATESHWARA MEDICAL AGENCIES","SRI VENKATESWARA MEDICAL AGENCIES","SRI VIJAY PHARMA","SRI VINAYAK PHARMA DISTRIBUTOR","SRI VN PHARMACEUTICALS","SRISUN PHARMA","STAJER VACCINE CENTER","STANDARD AGENCIES","SUBA PHARMAGES","SURESH PHARMA AGENCIES (CHENNAI) PVT LTD","SVS PHARMACEUTICALS","SWAPNA PHARMA KASARAGOD","TELY DRUGS","THE CITY DRUGS","THIRUPATHI AND THIRUMALA","THODUPUZHA DRUG HOUSE PRIVATE LIMITED","TRUST PHARMACEUTICALS","UMESH PHARMA","UNIQUE ENTERPRISES","UNITY DRUG HOUSE","VA DISTRIBUTORS","VACCI CARE","VALLI PHARMA","VARDHMAN MEDISALES PVT LTD","VARGHESE & COMPANY","VEE VEE PHARMA","VELAN PHARMA","VEXWIN PHARMA TRADERS","VINOD PHARMA","VMS LIFE CARE","WESTERN HEALTH CARE SOLUTIONS PVT LTD","YOGIRAM DISTRIBUTORS PVT LTD","ZENEX INTERNATIONAL"
+    ];
+    const RECEIVED_FROM_NAMES = [
+      "A ANANTHAN","A FAROOK","A MOHAMMED YASEEN JANI","A MUBARAK ALI","A MURALIDHARAN","A VIGNESH KUMAR","A.MASANAMUTHU","AABUBKAR","ABDUL HAKEEM","ABDUL KHADER JEELANI","ABDUL NISHADMON P","ABDUL RAHMAN","ABDUL RAHOOF","ABDUL SHUKOOR P","ABDUL WASEEM ILAHI","ABDULHAMEED F NADAF","ABDULLAH SHARIEF MOHAMMED ZAFRULLAH","ABDUR RAHMAN D","ABDUR REHMAN MAHATHUM","ABULKHASEEM GADAGKAR","ADARSH J","AJITH SHANMUGAM","AKHIL P ASHOK","AKHIL SK","AKSHARA S","AKSHAY K A","AKSHAY S","AKSHAY S M","AMBAREESH PATIL","ANANTHAN S","ANEES NASIR","ANEESH G S","ANEESHKUMAR PS","ANIL KUMAR VISHWAKARMA","ANISH A","ANISH KUMAR K","ANOOP.C","ANUSHA P MOHANAN","APSANA Y","ARAVIND","ARJUN PJ","ARJUN S K","ARSATH KHAN S","ARSHAD A KAZI","ARSHAL PP","ARUMUGAM","ARUN KS","ARUN KUMAR A","ARUN KUMAR S","ARUNKUMAR R","ASARUDEEN M","ASGARALI MIRANWARALI RAFAI","ASHARAF","ASHOK KUMAR S","ASHOKKUMAR","ASLAM KHAN","ASWANTH PP","ATIF UR RAHMAN","AYNUL BARI","AYYANAR M","AZHARUDDIN","BALAJI","BALAJI RATHAKRISHNAN","BALAJI S","BALAMURUGAN S","BARANIKUMAR KRISHNAMOORTHI","BASAVARAJ","BHAGAVATHI SELVA S","BHAGEERADH","BHARAMAPPA A NESARGI","BINU K P","C DINAKARAN","CHANDAN S N","CHANDHIRASEKARAN","CHELLADURAI K","D SANJAY","DARSHAN KS","DASHAGEER BABANAGAR","DATTATRI","DEEPAK KUMAR V","DEEPAK MR","DEEPU S","DEVAKUMAR V","DHANAPAL DURAISAMY","DHANAPAL S","DHANRAJ","DHANUSH","DHARBAR RAJA K","DINESHKRISHNA K R","DINU PAULY","DIPAK BABURAV DELEKAR","DIVIN KURIAN","DURAIRAJ K","ESWARAN PANDIYAN P","FAIROSE KHAN A","FAKKEERAPPA EMMI","G AJAYKUMAR","GIRISH KUMAR MOHANKUMAR","GOKUL PRASANTH L","GOKULA KANNAN A","GOKULESHWAR RAVI","GOPINATH KUPPOVIREDDY","GOVINDARAJ P","GOWTHAM KALISHWARAN","GUNASEKARAN P","HAFSAL RAHMAN MOOZHIYAN","HARIHARAN VASUNAIDU","HARIHARAN VENKATESH","HARIKRISHNAN","HARIPRASAD RAMAKRISHNA MAKATE","HASRATH ABUTHAHIR","HUMAYUN RASHEED","IRAFAN NADAF","JAGADEESAN R","JAGADEESH","JAGADHEESHEN R","JAIGANESH KALIRAJ","JAINJOSEPH S","JAWAID AHMAD MIR","JAYAPRABHU N","JAYESH M G","JEEVA A","JERON RS","JEYASURYA","JISHNU C S","JISHNU DEV S","JISMON JOHNY","JITHESH K","JITHESH NAIK P R","JITHIN JS","JITHIN K","JUMAYA K A","JUNAID KHAN","K.GOPINATH","K.RAJKUMAR","KAILAS H","KALAISELVAN GURUNATHAN","KALLANAI P","KAMAL B","KANNADAS S","KANNAN S.M","KANNAN.M","KARTHIK N","KARTHIK S","KARTHIKEYAN A","KARUNANIDHI RASAKANNU","KAVIYARASU","KEDARINATH","KIRAN A R","KIRAN KM","KUMAR G","KUMMARY SRINIVASULU","KUNACILAN V","KURUBA SESHADRI","LAKIALI KASHIMSAB MANGASOOLI","LAL KRISHNA S","LALITHA ANAND V","LENIN S","LOGESH M","M A NOWFAL ISMAIL","M ABHIJITH","M AMBETHKUMAR","M D FAIZAL IQBAL","M.DHAVAMOORTHY","MAHAMMADSAQIB","MAHARAJAN K","MAHAROOF M T","MAMUNEESWARAN RAJENDRAN","MANIGANDAN PALANI","MANIKANDAN GN","MANISHA MARUṬI NAIK","MANJUNATH","MANJUNATHA","MANOJ M","MANU TP","MEERA P","MEHBOOB HUSSAIN SHAH","MITHESH B","MOHAMED ANSAL M","MOHAMED ANSAR S","MOHAMED NOORUL AFFZAR.S","MOHAMED SIRAJ M","MOHAMMAD AFSHAN M V","MOHAMMAD AQUEEL","MOHAMMAD ASHIQ","MOHAMMAD HUSSAIN MIR","MOHAMMAD SHAMEER AK","MOHAMMED KHAZA MOIDEEN","MOHAMMED RASHIK K","MOHAMMED RIZWAN M","MOHAMMED SAQIB BASEER","MOHAMMED SHAKIR RIZWAN","MOHAN RAAJ CS","MOHANRAJ KRISHNAN","MUBARAK A","MUHAMMAD ILYAS A","MUHAMMED RASHIK M","MUHAMMED SAYEDALI.N","MUJIBUR RAHMAN S","MUKESH C","MUKESH KUMAR","MUKESH R","MUTHUMAINKKAM S","MUTHUSELVAM C","MUZAMMIL ANWAR SATTAR","N SUNDAR SURESH","NAGARAJ S","NAJEEBULLA K P","NASSAR ULLAH SHALA","NAVEED AHAMED","NAVEEN INAS FERNANDES","NAVEEN VELUSAMY","NAWAS M","NEHRU R","NIKHIL B","NIRSHAD AHAMMED AT","NISARGA CHAVAN","NITHIN M","NIZARALI N","P.MANIKANDAN","PARTHIBAN A","PAVIKUMAR A","PAVITHRAN D","PERIYAPANDI P","PHILIPS P","PONMALAI JEMINI","PONMURUGAN M","POORNIMA BIRADAR SAVANUR","PRABU T.M.","PRAJEESH TG","PRAKASH KUPPUSAMI","PRANEETH M","PRASAD S","PRASANNA KUMAR","PRASANNA SRINIVASAN","PRATHVIRAJ","PRAVEEN KP","PRAVEEN KUMAR H","PREM SANKAR B","PRINCE PETER","PRITAM DEEPAK PEDNEKAR","R KALIAPPAN","RAHUL B","RAHUL E","RAHUL PK","RAHUL RAJEEV","RAJA H","RAJABHAKSHI","RAJALAKSHMI R","RAJASHEKHARA","RAJEESH P","RAKESH B","RAMALINGAM C","RANJITH KUMAR AYYAMPERUMAL","RATHNAMOORTHY NADARAJ","RAVISANKAR.R","RAZIK ZAIN V","RIJIN AYANKI","RINSHAD","RIYAS AHAMMED T R","RIYAS BABU I","S KANNAN","S RAVITEJA","S. AJAI VIGNESH","S.KANDASAMY","SAAD K V","SABARINATHAN CHANDRU","SABIN B","SADASHIVA HUDDAR","SAJAD AHMAD WANI","SAJAN THOMAS","SAKTHIVEL SUBRAMANIAN","SAMSUDEEN A","SANDEEP K DAYANAND","SANIYA TABASSUM","SANJAY CHAURASIYA","SANJAY M","SANJUKUMAR","SANKARAMOORTHI T","SANTHOSH P","SANTHOSHKUMAR C","SANTHOSHKUMAR K","SANTOSH REDDY","SARAN SASEENDRAN","SARATH KUMAR VS","SATHISHKUMAR THANGAVEL","SATHIYA MURTHY S","SAYANA A S","SEENUVASAN BALAKRISHNAN","SELVAKUMAR N","SELVAKUMAR S","SELVARAJ P","SELVARAJ PONNUSAMY","SHABAB ZEHRA","SHAHNAWAZ AHMED","SHAIK BUDENSHA VALI","SHAJAJAN. S","SHARFUDEEN BUHARY S M","SHAYK MUSTHAFA. J","SHEIK ABDULLA K","SHIBIN KS","SHIVANAND","SHODHANA R SHETTY","SHRIDHAR NAGNATH UTKAL","SIDHARTH DINESH V","SIRANJEEVI S","SIVANESAN K","SOUMYA SALIMKUMAR","SRAVAN K","SREEDEVI EK","SREEJITH R","SRIDHARA B","SRINIVASAN S","SRITHAR","SUBASH MURUGESAN","SUBHAN D","SUBRAMANIAN M","SUHAIL MAHAMMAD","SUJIN S","SUJITH.S","SULAIMAN G","SULTHAN ALAVUDEEN N M","SUMANTHA C S","SUNDARAMOORTHY M","SUNILRAJ S","SURESH KUMAR S","SURIYA N","SURYALAKSHMI A","SYED ALI M A","SYED AMEENUL ASLAM S","SYED BAKRUTHIN ALI S","SYED MUFIZ","SYED SULEMAN","SYED ZAKIR PASHA","T.KARTHICK","THANSEER KHAN N S","THEJAS V JOSE","THENSAD CV","THIRUMURUGAN M","THIRUPAL","TOQIER PASHA","UNAIS K","V.MADHUBABU","VAITHILINGAM N","VASANTH SIVASAMY","VELU R","VIBIN KV","VIGNESH NAGAPANDI","VIGNESHWARAN D","VIGNESHWARAN K","VIJAY ANAND B","VIJAY C","VIJAY M","VIJAYABASKER M","VIKNESH MAGUDEESHWARAN","VINAYAK MARUTI MALI","VINEESH PC","VINEETH VJ","VIPIN V NAIR","VISHAL SAVANT KAMBLE","VISHNU BALAKRISHNAN","VISHNU D P","VISHNU PK","VISHNU PRASAD M P","VISHNU SASI","VISHWANATHA G","VISWESWARAN C","VIVEK","YASAR ARAFATH JAHIR HUSAIN","YATHISH NARAYANA"
+    ];
+
+    function populatePartyNamesDatalist() {
+        const dl = document.getElementById('partyNames');
+        dl.innerHTML = PARTY_NAMES.map(n => `<option value="${n.toUpperCase()}">`).join('');
+    }
+    function populateReceivedFromNamesDatalist() {
+        const dl = document.getElementById('receivedFromNames');
+        dl.innerHTML = RECEIVED_FROM_NAMES.map(n => `<option value="${n.toUpperCase()}">`).join('');
+    }
+    
+    function downloadNeftErrorReport(errorRows) {
+    const wb = XLSX.utils.book_new();
+    const wsData = [
+        ['#', 'Date', 'Party Name', 'State', 'Amount (INR)', 'Reason']
+    ];
+    errorRows.forEach((r, i) => {
+        wsData.push([
+            i + 1,
+            r.date,
+            r.party,
+            r.state || 'NOT FOUND IN DB',
+            r.amount,
+            r.state === '?' ? 'Party not found in database' : 'Invalid / zero amount'
+        ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [
+        { wch: 4 }, { wch: 14 }, { wch: 42 },
+        { wch: 16 }, { wch: 16 }, { wch: 34 }
+    ];
+
+    /* Style header row red */
+    const headerStyle = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: 'DC2626' } },
+        alignment: { horizontal: 'center' }
+    };
+    ['A1','B1','C1','D1','E1','F1'].forEach(cell => {
+        if (ws[cell]) ws[cell].s = headerStyle;
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Upload Errors');
+    const now = new Date();
+    const stamp = `${now.getDate().toString().padStart(2,'0')}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getFullYear()}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
+    XLSX.writeFile(wb, `BankReceipts_Upload_Errors_${stamp}.xlsx`);
+}
+
+    // ═══════════════════════════════════════════════════════════════
+    // EVENT LISTENERS & INIT
+    // ═══════════════════════════════════════════════════════════════
+    ['receivedFrom', 'partyName', 'branch'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', toUpperCase);
+    });
+    otherBankNameEl.addEventListener('input', toUpperCase);
+    bankNameEl.addEventListener('change', () => {
+        if (bankNameEl.value === 'OTHER') { otherBankNameEl.style.display = 'block'; otherBankNameEl.focus(); }
+        else { otherBankNameEl.style.display = 'none'; otherBankNameEl.value = ''; }
+    });
+    addRowBtn.addEventListener('click', newRow);
+    submitBtn.addEventListener('click', submitDataToSheet);
+    reportBtn.addEventListener('click', () => window.open('report.html', '_blank'));
+    modifyBtn.addEventListener('click', () => window.open('modify.html', '_blank'));
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        receivedDateEl.value = today.toISOString().split('T')[0];
+        bankNameEl.innerHTML = generateHeaderBankOptions();
+        populatePartyNamesDatalist();
+        populateReceivedFromNamesDatalist();
+        newRow();
+    });
+  </script>
+</body>
+</html>
