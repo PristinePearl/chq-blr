@@ -17,8 +17,8 @@
             extend: {
                 fontFamily: { sans: ['Inter', 'sans-serif'] },
                 colors: {
-                    'primary-indigo': '#4F46E5',
-                    'dark-indigo': '#3730A3',
+                    'primary-indigo': '#db2777',
+                    'dark-indigo': '#9d174d',
                     'secondary-green': '#059669',
                     'upload-red': '#DC2626',
                     'app-bg': '#F4F7F9',
@@ -41,7 +41,7 @@
         background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="%234F46E5" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592c.86 0 1.32 1.013.754 1.658L8.753 11.14a.92.92 0 0 1-1.506 0z"/></svg>');
         background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem;
     }
-    .table-container { max-height: 400px; overflow-y: auto; border-radius: 0.75rem; border: 1px solid #c7d2fe; }
+    .table-container { max-height: 400px; overflow-y: auto; border-radius: 0.75rem; border: 1px solid #fbcfe8; }
     th { position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); padding-top: 1rem; padding-bottom: 1rem; }
     .item-row input[name*="chqValue"] { text-align: right; font-weight: 600; color: #DC2626; background: #FEF2F2; }
     .item-row input, .item-row select { padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0.5rem; transition: border-color 0.2s, box-shadow 0.2s; }
@@ -97,18 +97,19 @@
     #neftPanel input[type="text"], #neftPanel input[type="number"] { text-transform: uppercase; }
   </style>
 </head>
-<body class="p-4 sm:p-8 min-h-screen font-sans antialiased" style="background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 40%, #ede9fe 100%)">
+<body class="p-4 sm:p-8 min-h-screen font-sans antialiased" style="background: linear-gradient(135deg, #fce7f3 0%, #fff1f7 40%, #fae8ff 100%)">
   
   <div class="container mx-auto">
-    <div class="bg-card-bg rounded-2xl p-6 sm:p-10 max-w-6xl mx-auto" style="box-shadow: 0 4px 30px rgba(79,70,229,0.13); border: 1px solid #c7d2fe;">
+    <div class="bg-card-bg rounded-2xl p-6 sm:p-10 max-w-6xl mx-auto" style="box-shadow: 0 4px 30px rgba(219,39,119,0.13); border: 1px solid #fbcfe8;">
       
-      <h1 class="text-3xl font-extrabold pb-4 mb-8 flex items-center justify-center tracking-wider" style="background: linear-gradient(135deg, #312e81 0%, #4f46e5 45%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #c7d2fe;">
+      <h1 class="text-3xl font-extrabold pb-4 mb-8 flex items-center justify-center tracking-wider" style="background: linear-gradient(135deg, #831843 0%, #db2777 45%, #c026d3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #fbcfe8;">
           <img src="https://pristinepearl.github.io/Home/alt-logo.png" alt="Pristine Pearl Pharma Logo" class="h-10 w-auto mr-4 rounded-full p-0.5 bg-gray-50 transition duration-300 hover:scale-105">
           PRISTINE PEARL PHARMA PVT LTD
       </h1>
+      <p class="text-center text-sm font-bold uppercase tracking-widest -mt-4 mb-6" style="color:#be185d;">Pristine Pearl Pharma - Bangalore</p>
 
-      <div class="p-5 border rounded-xl mb-8 space-y-6" style="background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%); border-color: #c7d2fe;">
-          <h2 class="text-md font-semibold pb-2 uppercase tracking-wider" style="background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #c7d2fe;">💳 Deposit Details</h2>
+      <div class="p-5 border rounded-xl mb-8 space-y-6" style="background: linear-gradient(135deg, #fdf4ff 0%, #fdf2f8 100%); border-color: #fbcfe8;">
+          <h2 class="text-md font-semibold pb-2 uppercase tracking-wider" style="background: linear-gradient(90deg, #db2777 0%, #c026d3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 2px solid #fbcfe8;">💳 Deposit Details</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
             <div class="input-group">
               <label for="receivedFrom" class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Received From</label>
@@ -161,7 +162,7 @@
 
       <div class="table-container shadow-lg">
           <table class="min-w-full">
-            <thead style="background: linear-gradient(90deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);" class="text-white">
+            <thead style="background: linear-gradient(90deg, #831843 0%, #db2777 50%, #c026d3 100%);" class="text-white">
               <tr>
                 <th style="width: 3%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">#</th>
                 <th style="width: 10%;" class="p-4 text-left text-xs font-semibold uppercase tracking-wider">Chq Date</th>
@@ -178,7 +179,7 @@
           </table>
       </div>
 
-      <div class="total-value-container flex justify-end items-center p-4 rounded-b-lg shadow-inner" style="background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%); border-top: 2px solid #6366f1;">
+      <div class="total-value-container flex justify-end items-center p-4 rounded-b-lg shadow-inner" style="background: linear-gradient(135deg, #fdf2f8 0%, #fdf4ff 100%); border-top: 2px solid #ec4899;">
           <span class="text-lg font-bold text-dark-indigo uppercase tracking-wider">TOTAL CHEQUE VALUE:</span>
           <strong id="totalValueDisplay" class="text-2xl font-extrabold text-upload-red ml-4">₹ 0.00</strong>
       </div>
@@ -195,7 +196,7 @@
         <div class="right-actions flex items-center gap-4">
           <button id="reportBtn" type="button"
                   class="px-6 py-3 rounded-xl font-semibold text-white transition duration-300 shadow-lg"
-                  style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); box-shadow: 0 4px 15px rgba(79,70,229,0.35);">
+                  style="background: linear-gradient(135deg, #db2777 0%, #c026d3 100%); box-shadow: 0 4px 15px rgba(219,39,119,0.35);">
             <i class="fa-solid fa-file-lines"></i> View Report
           </button>
           <button id="modifyBtn" type="button"
@@ -441,7 +442,7 @@
       </div>
       <div class="flex justify-end space-x-3">
           <button id="modalCloseBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 font-medium">Close</button>
-          <button id="modalConfirmBtn" class="px-4 py-2 text-white rounded-lg transition duration-150 hidden font-medium" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">Confirm</button>
+          <button id="modalConfirmBtn" class="px-4 py-2 text-white rounded-lg transition duration-150 hidden font-medium" style="background: linear-gradient(135deg, #db2777 0%, #c026d3 100%);">Confirm</button>
       </div>
     </div>
   </div>
@@ -454,7 +455,7 @@
     // CONFIGURATION
     // ═══════════════════════════════════════════════════════════════
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2TalWdqp0qa8ZAxewKder-75f8t1MNHqoG41uuuJSoyY8PcfbyZh90V7NskXbXUiT9g/exec';
-    const SECRET_PASSWORD = 'pearl#chq';
+    const SECRET_PASSWORD = 'blr#123';
 
     // NEFT Script URL — UPDATE THIS to your NEFT Apps Script URL
     const NEFT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFy0g-VLM5mcMF5MAEsGB_5KR-qdwk_DlsJQ4YTYE0IrxMIt2sqDMC3X1VUbHhCEn0/exec';
