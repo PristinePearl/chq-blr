@@ -21,7 +21,7 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 40%, #ede9fe 100%);
+            background: linear-gradient(135deg, #fce7f3 0%, #fff1f7 40%, #fae8ff 100%);
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -35,11 +35,11 @@
 
         .left-panel {
             width: 350px;
-            background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
-            border-right: 2px solid #c7d2fe;
+            background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%);
+            border-right: 2px solid #fbcfe8;
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 0 20px rgba(79, 70, 229, 0.12);
+            box-shadow: 4px 0 20px rgba(219, 39, 119, 0.12);
             flex-shrink: 0;
         }
 
@@ -53,13 +53,13 @@
 
         .header {
             /* Rich Indigo to Violet Gradient */
-            background: linear-gradient(135deg, #312e81 0%, #4f46e5 45%, #7c3aed 100%); 
+            background: linear-gradient(135deg, #831843 0%, #db2777 45%, #c026d3 100%); 
             color: white;
             padding: 18px 20px;
             text-align: center;
             border-bottom: none;
             flex-shrink: 0;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 4px 15px rgba(219, 39, 119, 0.4);
         }
 
         .header-content {
@@ -104,15 +104,15 @@
             background: none;
             font-size: 0.95rem;
             font-weight: 500;
-            color: #4338ca;
+            color: #be185d;
             border-left: 4px solid transparent;
         }
         
         .tab-button.active {
-            background: linear-gradient(90deg, #eef2ff 0%, #f5f3ff 100%);
+            background: linear-gradient(90deg, #fdf2f8 0%, #fdf4ff 100%);
             font-weight: 600;
-            color: #3730a3; 
-            border-left: 4px solid #4f46e5; 
+            color: #9d174d; 
+            border-left: 4px solid #db2777; 
         }
 
         .search-section {
@@ -151,7 +151,7 @@
 
         .form-group input, .form-group textarea {
             padding: 10px 12px;
-            border: 1.5px solid #c7d2fe;
+            border: 1.5px solid #fbcfe8;
             border-radius: 8px;
             font-size: 0.9rem;
             transition: all 0.2s ease;
@@ -160,13 +160,13 @@
         
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
-            border-color: #4f46e5; 
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); 
+            border-color: #db2777; 
+            box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.15); 
         }
 
         .btn {
             padding: 12px 20px;
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); 
+            background: linear-gradient(135deg, #db2777 0%, #c026d3 100%); 
             color: white;
             border: none;
             border-radius: 8px;
@@ -175,13 +175,13 @@
             font-weight: 600;
             transition: all 0.2s ease;
             margin-top: 10px;
-            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 2px 10px rgba(219, 39, 119, 0.3);
         }
 
         .btn:hover {
-            background: linear-gradient(135deg, #3730a3 0%, #6d28d9 100%); 
+            background: linear-gradient(135deg, #9d174d 0%, #a21caf 100%); 
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.45);
+            box-shadow: 0 4px 15px rgba(219, 39, 119, 0.45);
         }
 
         /* SAVE/MODIFY button - vibrant teal-green */
@@ -212,8 +212,8 @@
             overflow-y: auto;
             margin: 10px;
             border-radius: 12px;
-            border: 1px solid rgba(199, 210, 254, 0.5);
-            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.08);
+            border: 1px solid rgba(251, 207, 232, 0.5);
+            box-shadow: 0 4px 20px rgba(219, 39, 119, 0.08);
         }
 
         .loading {
@@ -225,23 +225,23 @@
         }
 
         .error {
-            background: #eef2ff; 
-            color: #4f46e5; 
+            background: #fdf2f8; 
+            color: #db2777; 
             padding: 15px;
             border-radius: 8px;
-            border-left: 4px solid #4f46e5; 
+            border-left: 4px solid #db2777; 
             margin: 10px 0;
             font-size: 0.9rem;
         }
 
         .result-card {
             background: white;
-            border: 1px solid #c7d2fe;
+            border: 1px solid #fbcfe8;
             border-radius: 10px;
             padding: 12px;
             margin-bottom: 8px;
-            box-shadow: 0 2px 12px rgba(79, 70, 229, 0.08);
-            border-top: 3px solid #4f46e5;
+            box-shadow: 0 2px 12px rgba(219, 39, 119, 0.08);
+            border-top: 3px solid #db2777;
         }
 
         .result-header {
@@ -276,14 +276,14 @@
         }
 
         .section {
-            background: #f5f3ff;
-            border: 1px solid #c7d2fe;
+            background: #fdf4ff;
+            border: 1px solid #fbcfe8;
             border-radius: 8px;
             overflow: hidden;
         }
 
         .section-header {
-            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(90deg, #db2777 0%, #c026d3 100%);
             color: white;
             padding: 7px 10px;
             font-size: 0.8rem;
@@ -350,13 +350,13 @@
 
         .no-results {
             text-align: center;
-            color: #6366f1;
+            color: #ec4899;
             font-style: italic;
             padding: 20px 10px;
             font-size: 0.9rem;
-            background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+            background: linear-gradient(135deg, #fdf2f8, #fdf4ff);
             border-radius: 8px;
-            border: 1px dashed #a5b4fc;
+            border: 1px dashed #f9a8d4;
         }
 
         /* --- Status indicator colors --- */
@@ -371,7 +371,7 @@
         .status-pending { background: #f59e0b; }
         .status-returned { background: #ef4444; }
         .status-represented { background: #eab308; }
-        .status-blank { background: #8b5cf6; }
+        .status-blank { background: #d946ef; }
 
     </style>
 </head>
@@ -381,7 +381,7 @@
             <div class="header">
                 <div class="header-content">
                     <img src="https://pristinepearl.github.io/Home/alt-logo.png" alt="PRISTINE PEARL PHARMA Logo" class="company-logo">
-                    <h1>PRISTINE CHEQUE MODIFIER</h1>
+                    <div><h1>PRISTINE CHEQUE MODIFIER</h1><div style="font-size:0.7rem;opacity:0.85;margin-top:2px;letter-spacing:0.06em;text-transform:uppercase;">Pristine Pearl Pharma - Bangalore</div></div>
                 </div>
             </div>
                     
@@ -393,7 +393,7 @@
 
                 <div id="chqSearch" class="tab-content active" style="display: block;">
                     <form class="search-form" id="searchForm">
-                        <h3 style="font-size: 1rem; margin-bottom: 5px; color: #3730a3;"> Search Cheque To Modify</h3>
+                        <h3 style="font-size: 1rem; margin-bottom: 5px; color: #9d174d;"> Search Cheque To Modify</h3>
                         <div class="form-group" style="display: none;">
                             <label for="sheetId">Google Sheet ID:</label>
                             <input type="text" id="sheetId" placeholder="Enter Google Sheet ID" value="1QbAhwb0HXsNtubOrDJpM_hqsbhmR7mmtZ09OrCAFkqY" required>
@@ -423,7 +423,7 @@
         // ******************************************************************************
 
         // --- PASSWORD CONSTANT ---
-        const EDIT_PASSWORD = "pearl@chq";
+        const EDIT_PASSWORD = "blr@chq";
         // -------------------------
 
         // Global variables for storing results
@@ -450,7 +450,7 @@
                 // Check if it's a blank cheque
                 const chqValue = parseFloat((row['Chq Value (₹)'] || '0').replace(/[^0-9.-]+/g,"")) || 0;
                 if (chqValue === 0 || !row['Chq Value (₹)']) {
-                    return { status: 'BLANK', color: '#8b5cf6', class: 'status-blank' };
+                    return { status: 'BLANK', color: '#d946ef', class: 'status-blank' };
                 }
                 return { status: 'PENDING', color: '#f59e0b', class: 'status-pending' };
             }
@@ -613,7 +613,7 @@ row.__rowIndex = i + 1; // 👈 ADD THIS (actual sheet row)
             let html = ` <div class="document-sections"> `;
 
             // Section 1: Cheque & Value Details
-            html += `<div class="section"><div class="section-header" style="background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);">💳 Cheque & Value Details</div><div class="section-content"><div class="section-grid">`;
+            html += `<div class="section"><div class="section-header" style="background: linear-gradient(90deg, #db2777 0%, #c026d3 100%);">💳 Cheque & Value Details</div><div class="section-content"><div class="section-grid">`;
             fields.filter(f => f.section === 1).forEach(field => {
                 html += getFieldHtml(field.label, field.key, row[field.key], field.type, isEditable);
             });
